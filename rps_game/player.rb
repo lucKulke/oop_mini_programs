@@ -2,7 +2,7 @@ require_relative "move.rb"
 
 class Player
   COMPUTER_NAMES = %w(Robocop CKL34 HondaRob).freeze
-  POSSIBLE_CHOICES = %w(rock paper scissor).freeze
+  POSSIBLE_CHOICES = %w(rock paper scissor lizard spock).freeze
   attr_reader :move, :score
   attr_accessor :name
 
@@ -29,7 +29,7 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "#{name} choose between Rock, Paper or Scissor"
+      puts "#{name} choose between Rock, Paper, Scissor, Lizard or Spock"
       choice = gets.chomp.downcase
       break if POSSIBLE_CHOICES.include?(choice)
 

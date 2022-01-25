@@ -1,14 +1,28 @@
 require_relative "player.rb"
 require_relative "scoreboard.rb"
+require_relative "histroy.rb"
 
 class RPSGame
-  MAX_SCORE = 3
+  RULES = <<-MSG
+    
+  Rock --> Scissors         Spock --> Rock  
+       --> Lizard                 --> Scissors
+  
+  Scissors --> Paper        Lizard --> Paper
+           --> Lizard              --> Spock
+  
+  Paper --> Rock
+        --> Spock
+          
+  MSG
+  MAX_SCORE = 10
   attr_accessor :human, :computer
 
   def initialize
     @human = Human.new
     @computer = Computer.new
     @scoreboard = Scoreboard.new(@human, @computer)
+    @history = History.new
   end
 
   def play
@@ -25,7 +39,9 @@ class RPSGame
   def rounds
     loop do
       system "clear"
+      display_history
       display_score_board
+      display_rules
       players_chose
       display_winner_of_round
       next_round? if !max_score_reached?
@@ -66,10 +82,6 @@ class RPSGame
     choice
   end
 
-  def display_score_board
-    @scoreboard.display
-  end
-
   def display_winner_of_round
     puts
     if human.move == computer.move
@@ -84,10 +96,10 @@ class RPSGame
   end
 
   def max_score_reached?
-    !!determine_winner
+    !!determine_winner_of_game
   end
 
-  def determine_winner
+  def determine_winner_of_game
     if @computer.score == MAX_SCORE
       @computer.name
     elsif @human.score == MAX_SCORE
@@ -97,19 +109,31 @@ class RPSGame
     end
   end
 
-  def display_winner_of_game
-    puts "#{determine_winner} won the game!!"
-    reset_scores
-  end
-
   def reset_scores
     @human.reset_score
     @computer.reset_score
   end
 
+  def display_history
+    @history.display
+  end
+
+  def display_winner_of_game
+    puts "#{determine_winner_of_game} won the game!!"
+    reset_scores
+  end
+
+  def display_score_board
+    @scoreboard.display
+  end
+
   def display_welcome_message
     puts 'Hello welcome to Rock, Paper, Scissors!'
     puts 'You play until someone has a score of 3'
+  end
+
+  def display_rules
+    puts RULES
   end
 
   def display_goodbye_message

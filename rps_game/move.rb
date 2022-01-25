@@ -1,4 +1,5 @@
 require_relative "player.rb"
+
 class Move
   attr_reader :value
 
@@ -9,11 +10,15 @@ class Move
   def >(other_move)
     case @value
     when 'rock'
-      other_move.scissors? ? true : false
+      other_move.scissors? || other_move.lizard?
     when 'paper'
-      other_move.rock? ? true : false
+      other_move.rock? || other_move.spock?
     when 'scissors'
-      other_move.paper? ? true : false
+      other_move.paper? || other_move.lizard?
+    when 'lizard'
+      other_move.spock? || other_move.paper?
+    when 'spock'
+      other_move.rock? || other_move.scissors?
     end
   end
 
@@ -31,5 +36,13 @@ class Move
 
   def paper?
     @value == 'paper'
+  end
+
+  def lizard?
+    @value == 'lizard'
+  end
+
+  def spock?
+    @value == 'spock'
   end
 end
