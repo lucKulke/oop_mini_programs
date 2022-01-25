@@ -35,7 +35,7 @@ class Human < Player
 
       puts 'no valid input try again..'
     end
-    puts "#{name} choose #{choice.capitalize}"
+    puts "#{name} chose : #{choice.capitalize}"
     @move = Move.new(choice)
   end
 end
@@ -44,11 +44,11 @@ class Computer < Player
   def set_name
     @name = COMPUTER_NAMES.sample
     puts "The name of the Computer is #{name}"
-    sleep(3)
+    sleep(2)
   end
 
   def choose
     @move = Move.new(POSSIBLE_CHOICES.sample)
-    puts "#{name} choice is : #{@move.value.capitalize}"
+    puts "#{name} chose : #{@move.value.capitalize}"
   end
 end

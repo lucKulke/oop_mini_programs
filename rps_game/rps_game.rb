@@ -1,6 +1,6 @@
 require_relative "player.rb"
 require_relative "scoreboard.rb"
-require_relative "histroy.rb"
+require_relative "history.rb"
 
 class RPSGame
   RULES = <<-MSG
@@ -15,7 +15,7 @@ class RPSGame
         --> Spock
           
   MSG
-  MAX_SCORE = 10
+  MAX_SCORE = 3
   attr_accessor :human, :computer
 
   def initialize
@@ -39,15 +39,12 @@ class RPSGame
   def rounds
     loop do
       system "clear"
-      display_history
-      display_score_board
-      display_rules
+      display_head
       players_chose
       display_winner_of_round
       next_round? if !max_score_reached?
       break if max_score_reached?
     end
-    display_score_board
     display_winner_of_game
   end
 
@@ -93,6 +90,7 @@ class RPSGame
       puts "#{@computer.name} won the round!"
       @computer.increase_score
     end
+    @history.moves << [@human.move.value.capitalize[0..1], @computer.move.value.capitalize[0..1]]
   end
 
   def max_score_reached?
@@ -114,13 +112,25 @@ class RPSGame
     @computer.reset_score
   end
 
+  def reset_history
+    @history.reset
+  end
+
+  def display_head
+    display_history
+    display_score_board
+    display_rules
+  end
+
   def display_history
     @history.display
   end
 
   def display_winner_of_game
+    display_score_board
     puts "#{determine_winner_of_game} won the game!!"
     reset_scores
+    reset_history
   end
 
   def display_score_board

@@ -1,9 +1,14 @@
-class Histroy
+class History
+  attr_accessor :moves
   def initialize
-    @history = []
+    @moves = []
+  end
+
+  def display
+    puts "History : #{moves}" 
   end
 
   def reset
-    @history = []
+    @moves = []
   end
 end
