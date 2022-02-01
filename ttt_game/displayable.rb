@@ -1,4 +1,4 @@
-module Info_share
+module Displayable
   def promt(message)
     puts message
   end

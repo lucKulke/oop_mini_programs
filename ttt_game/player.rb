@@ -1,7 +1,7 @@
-require_relative "info_share.rb"
+require_relative "displayable.rb"
 
 class Player
-  include Info_share
+  include Displayable
   
   attr_accessor :score
   

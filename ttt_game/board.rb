@@ -1,11 +1,11 @@
-require_relative "info_share.rb"
+require_relative "displayable.rb"
 
 SYMBOL_COMPUTER = 'O'
 SYMBOL_PLAYER = 'X'
 
 class Board
   
-  include Info_share
+  include Displayable
   attr_accessor :computer_square, :human_square, :human_score, :computer_score, :rounds
   attr_reader :brd
 
