@@ -15,6 +15,25 @@ module Displayable
   end
 end
 
+module DetermineWinner
+  def determine_winner
+    winner = nil
+    [HUMAN_SYMBOL, COMPUTER_SYMBOL].each do |symbol|
+      winner = check_lines(winner, symbol)
+    end
+    winner
+  end
+
+  def check_lines(winner, symbol)
+    WINNING_LINES.each do |line|
+      if @board.brd[line[0]] == symbol && @board.brd[line[1]] == symbol && @board.brd[line[2]] == symbol
+        winner = symbol
+      end
+    end
+    winner
+  end
+end
+
 class Board
   include Displayable
   attr_reader :brd
@@ -87,6 +106,7 @@ end
 #------------------------------------------------
 
 class Player
+  include DetermineWinner
   include Displayable
 
   def initialize(board)
@@ -131,10 +151,10 @@ class Computer < Player
 
   private
 
-  def minimax(board, is_maximizing)                           # minimax algorithm explanation :
-    return 1 if determine_winner_for_minimax == 'Computer'    # the computer plays the game against itself to the
-    return -1 if determine_winner_for_minimax == 'Human'      # end in all possible ways and then
-    return 0 if @board.full?                                  # gives all moves scores
+  def minimax(board, is_maximizing) # minimax algorithm explanation :
+    return 1 if minimax_winner == 'Computer'    # the computer plays the game against itself to the
+    return -1 if minimax_winner == 'Human'      # end in all possible ways and then
+    return 0 if @board.full? # gives all moves scores
 
     if is_maximizing
       best_score = -1000
@@ -164,15 +184,8 @@ class Computer < Player
     best_score
   end
 
-  def determine_winner_for_minimax
-    winner = nil
-    [HUMAN_SYMBOL, COMPUTER_SYMBOL].each do |symbol|
-      WINNING_LINES.each do |line|
-        if @board.brd[line[0]] == symbol && @board.brd[line[1]] == symbol && @board.brd[line[2]] == symbol
-          winner = symbol
-        end
-      end
-    end
+  def minimax_winner
+    winner = determine_winner
     return winner == HUMAN_SYMBOL ? 'Human' : 'Computer' if winner
     nil
   end
@@ -181,6 +194,7 @@ end
 #----------------------------------------------
 
 class TTTgame
+  include DetermineWinner
   include Displayable
   attr_accessor :winner_of_round, :winner_of_game, :rounds_to_play
 
@@ -292,15 +306,7 @@ class TTTgame
   end
 
   def determine_winner_of_round
-    winner = nil
-    [HUMAN_SYMBOL, COMPUTER_SYMBOL].each do |symbol|
-      WINNING_LINES.each do |line|
-        if @board.brd[line[0]] == symbol && @board.brd[line[1]] == symbol && @board.brd[line[2]] == symbol
-          winner = symbol
-        end
-      end
-    end
-
+    winner = determine_winner
     return @winner_of_round = winner == HUMAN_SYMBOL ? 'Human' : 'Computer' if winner
     nil
   end
