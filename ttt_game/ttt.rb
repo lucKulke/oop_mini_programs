@@ -51,18 +51,18 @@ class Board
     9.times { |step| @brd[step + 1] = ' ' }
   end
 
-  def new_game # resets the board, scores and rounds
+  def new_game
     reset
     @human_score = 0
     @computer_score = 0
     @rounds = 0
   end
 
-  def possible_choices # determine the empty boxes
+  def possible_choices 
     @brd.select { |_, box| box == ' ' }
   end
 
-  def full? # check if board is full
+  def full?
     !@brd.any? { |_, box| box == ' ' }
   end
 
@@ -115,7 +115,7 @@ class Player
 end
 
 class Human < Player
-  def mark # ask the user to decide on witch position he want to mark and call the mark method from the board object
+  def mark
     valid_input = @board.possible_choices.keys
     user_choice = nil
     promt(MESSAGE['human_mark'] + " #{valid_input}")
