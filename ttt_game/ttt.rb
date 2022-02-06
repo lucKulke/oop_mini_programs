@@ -209,7 +209,7 @@ class TTTgame
     promt(MESSAGE['welcome'])
     loop do
       game
-      break if play_again?
+      break unless play_again?
     end
     promt(MESSAGE['goodbye'])
   end
@@ -244,15 +244,12 @@ class TTTgame
     loop do
       user_input = gets.chomp.downcase
       if ['y', 'n'].include?(user_input)
-        if user_input == 'y'
-          @board.new_game
-          return false
-        else
-          return true
-        end
+        return @board.new_game if user_input == 'y'
+        break
       end
       promt(MESSAGE['play_again_invalid_input'])
     end
+    false
   end
 
   def set_scores
