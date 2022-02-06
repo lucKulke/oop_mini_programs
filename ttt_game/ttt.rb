@@ -73,33 +73,33 @@ class Board
   def display
     clear_terminal
 
-    puts "Try to beat the Computer!!!"
-    puts "---------------------------"
-    puts "Round  #{rounds + 1}           "
+    puts " Try to beat the Computer!!!"
+    puts " ---------------------------"
+    puts "        * Round #{[rounds + 1]} *           "
     puts ""
     puts "Player_points | Computer_points "
-    puts "--------------------------------"
+    puts "-------------------------------"
     puts "       #{human_score}      |     #{computer_score}"
-    puts "___________________________"
+    puts "  ___________________________"
     puts ""
-    puts "You're a X. Computer is O."
-    puts "************************"
-    puts "*        BOARD         *"
-    puts "*        -----         *"
-    puts "*                      *"
-    puts "*       |     |        *"
-    puts "*    #{@brd[1]}  |  #{@brd[2]}  |  #{@brd[3]}     *"
-    puts "*       |     |        *"
-    puts "*  -----------------   *"
-    puts "*       |     |        *"
-    puts "*    #{@brd[4]}  |  #{@brd[5]}  |  #{@brd[6]}     *"
-    puts "*       |     |        *"
-    puts "*  -----------------   *"
-    puts "*       |     |        *"
-    puts "*    #{@brd[7]}  |  #{@brd[8]}  |  #{@brd[9]}     *"
-    puts "*       |     |        *"
-    puts "*                      *"
-    puts "************************"
+    puts "   You're a X. Computer is O."
+    puts "   ************************"
+    puts "   *        BOARD         *"
+    puts "   *        -----         *"
+    puts "   *                      *"
+    puts "   *       |     |        *"
+    puts "   *    #{@brd[1]}  |  #{@brd[2]}  |  #{@brd[3]}     *"
+    puts "   *       |     |        *"
+    puts "   *  -----------------   *"
+    puts "   *       |     |        *"
+    puts "   *    #{@brd[4]}  |  #{@brd[5]}  |  #{@brd[6]}     *"
+    puts "   *       |     |        *"
+    puts "   *  -----------------   *"
+    puts "   *       |     |        *"
+    puts "   *    #{@brd[7]}  |  #{@brd[8]}  |  #{@brd[9]}     *"
+    puts "   *       |     |        *"
+    puts "   *                      *"
+    puts "   ************************"
   end
 end
 
@@ -211,6 +211,7 @@ class TTTgame
       game
       break unless play_again?
     end
+    clear_terminal
     promt(MESSAGE['goodbye'])
   end
 
