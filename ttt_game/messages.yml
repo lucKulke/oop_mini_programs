@@ -8,7 +8,7 @@ set_rounds: "how many rounds do you want to play? (max 10)"
 set_rounds_invalid_input: "invalid input.. enter number between 1..10"
 human_mark: "please mark a square.. possible inputs are"
 human_mark_invalid_input: "no valid input.. possible inputs are"
-computer_mark: "Computer marks a square.."
+computer_mark: "Computer marks a square.. (please wait)"
 round_tie: "its a Tie!"
 game_tie: "No one won the game .. its a Tie!!! :/"
 
