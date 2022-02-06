@@ -1,5 +1,15 @@
 welcome: "Welcome to Tic Tac Toe!"
 goodbye: "Thanks for playing. Goodbye!"
-congrat: "you won the game!!!"
+congrat_round: " you won the round!"
+congrat_game: " you won the game!!! :D"
 play_again?: "Do you want to play again? (y/n)"
 play_again_invalid_input: "invalid input.. enter y or n"
+set_rounds: "how many rounds do you want to play? (max 10)"
+set_rounds_invalid_input: "invalid input.. enter number between 1..10"
+human_mark: "please mark a square.. possible inputs are"
+human_mark_invalid_input: "no valid input.. possible inputs are"
+computer_mark: "Computer marks a square.."
+round_tie: "its a Tie!"
+game_tie: "No one won the game .. its a Tie!!! :/"
+
+ 
