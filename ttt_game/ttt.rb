@@ -151,10 +151,10 @@ class Computer < Player
 
   private
 
-  def minimax(board, is_maximizing) # minimax algorithm explanation :
+  def minimax(board, is_maximizing)             # minimax algorithm explanation :
     return 1 if minimax_winner == 'Computer'    # the computer plays the game against itself to the
     return -1 if minimax_winner == 'Human'      # end in all possible ways and then
-    return 0 if @board.full? # gives all moves scores
+    return 0 if @board.full?                    # gives all moves scores
 
     if is_maximizing
       best_score = -1000
