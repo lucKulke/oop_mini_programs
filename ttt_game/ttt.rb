@@ -217,8 +217,8 @@ class TTTgame
   private
 
   def game
-    clear_terminal
     set_rounds
+    clear_terminal
     loop do
       round
       break if @board.rounds == @rounds_to_play
