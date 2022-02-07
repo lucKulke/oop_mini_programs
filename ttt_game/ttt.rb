@@ -41,13 +41,13 @@ class Board
 
   def initialize
     @brd = {} # is the datastructure for the board (Hash object)
-    9.times { |step| @brd[step + 1] = ' ' } # set up a hash with the positions as key and the boxes as values {1 => ' ', 2 => ' ', ...}
+    reset
     @human_score = 0
     @computer_score = 0
     @rounds = 0
   end
 
-  def reset # override all markers with empty space (' ')
+  def reset # set up a hash with the positions as key and the boxes as values {1 => ' ', 2 => ' ', ...}
     9.times { |step| @brd[step + 1] = ' ' }
   end
 
