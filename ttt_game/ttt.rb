@@ -208,7 +208,7 @@ class TTTgame
     clear_terminal
     promt(MESSAGE['welcome'])
     loop do
-      game
+      main_game
       break unless play_again?
     end
     clear_terminal
@@ -217,7 +217,7 @@ class TTTgame
 
   private
 
-  def game
+  def main_game
     set_rounds
     clear_terminal
     loop do
