@@ -40,6 +40,7 @@ class Board
   attr_accessor :rounds, :human_score, :computer_score
 
   def initialize # datastructure of the board is a hash
+    @brd = {}
     new_game
   end
 
