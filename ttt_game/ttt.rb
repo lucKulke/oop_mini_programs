@@ -42,9 +42,7 @@ class Board
   def initialize
     @brd = {} # is the datastructure for the board (Hash object)
     reset
-    @human_score = 0
-    @computer_score = 0
-    @rounds = 0
+    new_game
   end
 
   def reset # set up a hash with the positions as key and the boxes as values {1 => ' ', 2 => ' ', ...}
