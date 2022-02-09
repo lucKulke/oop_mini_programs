@@ -1,9 +1,11 @@
-require "yaml"
-MESSAGE = YAML.load_file("messages.yml")
+# frozen_string_literal: true
+
+require 'yaml'
+MESSAGE = YAML.load_file('messages.yml')
 HUMAN_SYMBOL = 'X'
 COMPUTER_SYMBOL = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
-                 [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
+                 [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]].freeze
 
 module Displayable
   def promt(message)
@@ -11,7 +13,7 @@ module Displayable
   end
 
   def clear_terminal
-    system "clear"
+    system 'clear'
   end
 end
 
@@ -26,9 +28,7 @@ module DetermineWinner
 
   def check_lines(winner, symbol)
     WINNING_LINES.each do |line|
-      if @board.brd[line[0]] == symbol && @board.brd[line[1]] == symbol && @board.brd[line[2]] == symbol
-        winner = symbol
-      end
+      winner = symbol if @board.brd[line[0]] == symbol && @board.brd[line[1]] == symbol && @board.brd[line[2]] == symbol
     end
     winner
   end
@@ -55,12 +55,12 @@ class Board
     @rounds = 0
   end
 
-  def possible_choices 
+  def possible_choices
     @brd.select { |_, box| box == ' ' }
   end
 
   def full?
-    !@brd.any? { |_, box| box == ' ' }
+    @brd.none? { |_, box| box == ' ' }
   end
 
   def mark(position, marker) # set the symbol of the current marker on the board
@@ -70,33 +70,33 @@ class Board
   def display
     clear_terminal
 
-    puts " Try to beat the Computer!!!"
-    puts " ---------------------------"
+    puts ' Try to beat the Computer!!!'
+    puts ' ---------------------------'
     puts "        * Round #{[rounds + 1]} *           "
-    puts ""
-    puts "Player_points | Computer_points "
-    puts "-------------------------------"
+    puts ''
+    puts 'Player_points | Computer_points '
+    puts '-------------------------------'
     puts "       #{human_score}      |     #{computer_score}"
-    puts "  ___________________________"
-    puts ""
+    puts '  ___________________________'
+    puts ''
     puts "   You're a X. Computer is O."
-    puts "   ************************"
-    puts "   *        BOARD         *"
-    puts "   *        -----         *"
-    puts "   *                      *"
-    puts "   *       |     |        *"
+    puts '   ************************'
+    puts '   *        BOARD         *'
+    puts '   *        -----         *'
+    puts '   *                      *'
+    puts '   *       |     |        *'
     puts "   *    #{@brd[1]}  |  #{@brd[2]}  |  #{@brd[3]}     *"
-    puts "   *       |     |        *"
-    puts "   *  -----------------   *"
-    puts "   *       |     |        *"
+    puts '   *       |     |        *'
+    puts '   *  -----------------   *'
+    puts '   *       |     |        *'
     puts "   *    #{@brd[4]}  |  #{@brd[5]}  |  #{@brd[6]}     *"
-    puts "   *       |     |        *"
-    puts "   *  -----------------   *"
-    puts "   *       |     |        *"
+    puts '   *       |     |        *'
+    puts '   *  -----------------   *'
+    puts '   *       |     |        *'
     puts "   *    #{@brd[7]}  |  #{@brd[8]}  |  #{@brd[9]}     *"
-    puts "   *       |     |        *"
-    puts "   *                      *"
-    puts "   ************************"
+    puts '   *       |     |        *'
+    puts '   *                      *'
+    puts '   ************************'
   end
 end
 
@@ -119,6 +119,7 @@ class Human < Player
     loop do
       user_choice = gets.chomp.to_i
       break if valid_input.include?(user_choice)
+
       promt(MESSAGE['human_mark_invalid_input'] + " #{valid_input}")
     end
     @board.mark(user_choice, :human)
@@ -131,14 +132,14 @@ class Computer < Player
     best_move = 0
     board = @board.brd
     board.keys.each do |position|
-      if board[position] == ' '
-        board[position] = COMPUTER_SYMBOL
-        score = minimax(board, false) # computer calls minimax allgorithm check wich move is the best based on the score
-        board[position] = ' '
-        if score > best_score # take the lowest score from the minimax allgorithm as best score
-          best_score = score
-          best_move = position
-        end
+      next unless board[position] == ' '
+
+      board[position] = COMPUTER_SYMBOL
+      score = minimax(board, false) # computer calls minimax allgorithm check wich move is the best based on the score
+      board[position] = ' '
+      if score > best_score # take the lowest score from the minimax allgorithm as best score
+        best_score = score
+        best_move = position
       end
     end
     promt(MESSAGE['computer_mark'])
@@ -156,26 +157,20 @@ class Computer < Player
     if is_maximizing
       best_score = -1000
       board.keys.each do |position|
-        if board[position] == ' '
-          board[position] = COMPUTER_SYMBOL
-          score = minimax(board, false)
-          board[position] = ' '
-          if score > best_score
-            best_score = score
-          end
-        end
+        next unless board[position] == ' '
+        board[position] = COMPUTER_SYMBOL
+        score = minimax(board, false)
+        board[position] = ' '
+        best_score = score if score > best_score
       end
     else
       best_score = 1000
       board.keys.each do |position|
-        if board[position] == ' '
-          board[position] = HUMAN_SYMBOL
-          score = minimax(board, true)
-          board[position] = ' '
-          if score < best_score
-            best_score = score
-          end
-        end
+        next unless board[position] == ' '
+        board[position] = HUMAN_SYMBOL
+        score = minimax(board, true)
+        board[position] = ' '
+        best_score = score if score < best_score
       end
     end
     best_score
@@ -184,6 +179,7 @@ class Computer < Player
   def minimax_winner
     winner = determine_winner
     return winner == HUMAN_SYMBOL ? 'Human' : 'Computer' if winner
+
     nil
   end
 end
@@ -241,8 +237,9 @@ class TTTgame
     promt(MESSAGE['play_again?'])
     loop do
       user_input = gets.chomp.downcase
-      if ['y', 'n'].include?(user_input)
+      if %w[y n].include?(user_input)
         return @board.new_game if user_input == 'y'
+
         break
       end
       promt(MESSAGE['play_again_invalid_input'])
@@ -257,6 +254,7 @@ class TTTgame
 
   def determine_winner_of_game
     return nil if @board.human_score == @board.computer_score
+
     @winner_of_game = @board.human_score > @board.computer_score ? 'Human' : 'Computer'
   end
 
@@ -285,6 +283,7 @@ class TTTgame
     loop do
       @rounds_to_play = gets.chomp.to_i
       break if (1..10).include?(rounds_to_play)
+
       promt(MESSAGE['set_rounds_invalid_input'])
     end
   end
@@ -293,6 +292,7 @@ class TTTgame
     @human.mark
     @board.display
     return if @board.full?
+
     @computer.mark
   end
 
@@ -303,6 +303,7 @@ class TTTgame
   def determine_winner_of_round
     winner = determine_winner
     return @winner_of_round = winner == HUMAN_SYMBOL ? 'Human' : 'Computer' if winner
+
     nil
   end
 end
