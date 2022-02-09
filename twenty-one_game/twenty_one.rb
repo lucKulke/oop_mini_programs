@@ -27,23 +27,28 @@ class Game
   end
 
   def play
+    clear_terminal
     display_message('welcome')
-    display_table
+    main_game
+    display_message('goodbye')
+  end
+
+  def main_game
     loop do 
       prepares_table
-      loop do  
-        deal_cards
-        display_table
-        
-        participants_turn
-        
-        display_winner
-        
-        break unless decision_about('round')
-      end
+      round
       break unless decision_about('game')
     end
-    display_message('goodbye')
+  end
+
+  def round
+    loop do  
+      deal_cards
+      display_table
+      participants_turn
+      display_winner
+      break unless decision_about('round')
+    end
   end
 
 
@@ -52,61 +57,67 @@ class Game
   end
 
   def determine_winner
-    if deck_empty?
+    if deck_empty? || @dealer.handscore == @player.handscore
       'nobody_won'
-    elsif @dealer.busted? || @dealer.handscore < @player.handscore
+    elsif @dealer.handscore < @player.handscore
+      return 'dealer_won' if @player.busted?
       'player_won'
-    else
+    elsif @player.handscore < @dealer.handscore
+      return 'player_won' if @dealer.busted?
       'dealer_won'
     end
   end
 
   
   def participants_turn
-    
+    @game_table.whose_turn = @player
+    return if !players_turn
+    @game_table.whose_turn  = @dealer
+    return if !dealers_turn 
+  end
+
+  def players_turn
+    players_decision = nil
     loop do 
       players_decision = decision_about('hit_or_stay', :turn) ? :hit : :stay 
-      @player.hand << @game_table.deck.cards.shift if players_decision == :hit
-      display_table
-      break if some_one_busted? || players_decision == :stay || deck_empty?
+      return false if @player.busted? || deck_empty? 
+      break if players_decision == :stay
+      draw_card(@player)
     end
-      
-    display_message('dealers_turn')
-    
-    loop do 
-      sleep(2)
-      @player.hand << @game_table.deck.cards.shift
-      display_table
-      break if some_one_busted? || over_min? || deck_empty?
+    players_decision
+  end
+
+  def dealers_turn
+    loop do
+      break if @dealer.over_min?
+      draw_card(@dealer)
+      return false if @dealer.busted? 
     end
-    
+  end
+
+  def draw_card(participant)
+    sleep (2) if participant == @dealer 
+    participant.hand << @game_table.deck.cards.shift
+    display_table
   end
 
   def deck_empty?
     @game_table.deck.cards.size < 5
   end
 
-  def some_one_busted?
-    [@dealer.handscore, @player.handscore].any?{ |score| score > MAX }
-  end
-
-  def over_min?
-    @dealer.handscore < DEALER_MIN
-  end
-
   def decision_about(decision, aktion=:loop_break)
-    aktion == :loop_break ? ask_for_decision("\n", 'n', decision) : ask_for_decision('h', 's', decision) 
+    aktion == :loop_break ? ask_for_decision('y', 'n', decision) : ask_for_decision('h', 's', decision) 
   end
 
-  def ask_for_decision(go, stop, decision)
+  def ask_for_decision(answer_a, answer_b, decision)
     display_message(decision)
     decision = nil
     loop do 
       decision = gets.chomp.downcase[0]
-      break if [go, stop].include?(decision)
+      break if [answer_a, answer_b].include?(decision)
       display_message('invalid_input')
     end
-    decision == go
+    decision == answer_a
   end
 
   def deal_cards
@@ -117,6 +128,10 @@ class Game
   end
 
   def prepares_table
+    sleep(1)
+    display_message('prepare_table')
+    sleep(2)
+    @game_table.whose_turn = @player
     @game_table.prepare
   end
 
@@ -131,7 +146,8 @@ class Game
 end
 
 class GameTable
-   attr_accessor :deck
+  include Displayable
+  attr_accessor :deck, :whose_turn
   
   def initialize(player, dealer)
     @player = player
@@ -140,9 +156,10 @@ class GameTable
   end
 
   def display
+    clear_terminal
     puts "______Twenty-One_______"
     puts ""
-    puts "Deck size = #{"deck.size"}"
+    puts "Deck size = #{@deck.cards.size}"
     puts ""
     puts "      PlayerP. |  DealerP. "
     puts "-----------------------------"
@@ -157,7 +174,7 @@ class GameTable
     puts "cards => #{@player.show_hand}"
     puts "_____________________________"
     puts ""
-    puts "------>>#{"whose_turn_is"}<<-------"
+    puts "------>>#{whose_turn}<<-------"
     puts "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
     puts ""
   end
@@ -179,16 +196,19 @@ class Deck
   attr_reader :cards
   
   def initialize
-    @cards = []
     mix
   end
 
   def mix
+    @cards = []
     SUIT.each do |suit|
       CARDS.each{ |type,_| @cards << Card.new(suit, type)}
-    end
-    @cards.shuffle!      
+    end    
   end   
+
+  def to_s
+    @cards
+  end
 
 end
 
@@ -211,13 +231,14 @@ class Participant
     @handscore = @roundscore = 0
   end
 
-  def update_handscore
+
+  def handscore
     @handscore = 0
     @hand.each{ |card| @handscore += CARDS[card.type]} 
+    @handscore
   end
 
   def show_hand
-    update_handscore
     @hand.map{ |card| "|#{card.suit} #{card.type}|" }
   end
 
@@ -229,9 +250,20 @@ end
 
 
 class Player < Participant
+  def to_s
+    'Player'
+  end 
 end
 
 class Dealer < Participant
+
+  def to_s
+    'Dealer'
+  end 
+
+  def over_min?
+    @handscore > DEALER_MIN
+  end
 end
 
 deck = Deck.new
