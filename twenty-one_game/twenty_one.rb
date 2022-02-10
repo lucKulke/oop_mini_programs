@@ -32,6 +32,8 @@ class Game
     display_message('goodbye')
   end
 
+  private
+
   def main_game
     loop do 
       prepares_table
@@ -157,7 +159,8 @@ end
 #------------------------------------
 class GameTable
   include Displayable
-  attr_accessor :deck, :whose_turn, :start_of_round
+  attr_accessor :whose_turn, :start_of_round
+  attr_reader :deck
   
   def initialize(player, dealer)
     @player = player
@@ -242,14 +245,12 @@ class Card
 end
 #------------------------------------
 class Participant
-  attr_accessor :hand, :move, :handscore, :roundscore
+  attr_accessor :hand, :handscore, :roundscore
   
   def initialize
     @hand = []
-    @move = nil
     @handscore = @roundscore = 0
   end
-
 
   def handscore(whose_turn = :dealer)
     return CARDS[hand.first.type] if whose_turn == :player
@@ -276,11 +277,11 @@ end
 #------------------------------------
 class Player < Participant
   def to_s
-    'Player'
+    'Player' 
   end 
 end
 #------------------------------------
-class Dealer < Participant  
+class Dealer < Participant
   def to_s
     'Dealer'
   end 
