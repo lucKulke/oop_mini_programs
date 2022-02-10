@@ -2,11 +2,11 @@ require 'yaml'
 MESSAGE = YAML.load_file('messages.yml')
 CARDS = { '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6, '7' => 7, '8' => 8, '9' => 9, '10' => 10, 'J' => 10, 'Q' => 10, 'K' => 10, 'A' => 11 }.freeze
 SUIT = ["\u2663", "\u2666", "\u2665", "\u2660"]
+SPECIALCARD = 'A'
 MAX = 21
 DEALER_MIN = 17
-
+#------------------------------------
 module Displayable
-
   def promt(message)
     puts message
   end
@@ -14,9 +14,8 @@ module Displayable
   def clear_terminal
     system 'clear'
   end
-
 end
-
+#------------------------------------
 class Game
   include Displayable
 
@@ -48,15 +47,14 @@ class Game
       participants_turn
       display_winner
       set_roundscore
+      break if deck_empty?
       break unless decision_about('round')
     end
   end
 
-
   def display_winner
     winner = determine_winner
     display_message(winner)
-    puts
   end
 
   def set_roundscore
@@ -65,9 +63,10 @@ class Game
     @dealer.roundscore += 1 if winner == 'dealer_won'
   end
     
-
   def determine_winner
-    if deck_empty? || @dealer.handscore == @player.handscore
+    if deck_empty? 
+      'deck_empty'
+    elsif@dealer.handscore == @player.handscore
       'nobody_won'
     elsif @dealer.handscore < @player.handscore
       return 'dealer_won' if @player.busted?
@@ -151,11 +150,11 @@ class Game
   end
 
   def display_message(status)
+    puts 
     promt(MESSAGE[status])
   end
-
 end
-
+#------------------------------------
 class GameTable
   include Displayable
   attr_accessor :deck, :whose_turn, :start_of_round
@@ -185,7 +184,7 @@ class GameTable
     puts "cards => #{@player.show_hand}"
     puts "_____________________________"
     puts ""
-    puts "---------->>#{whose_turn}<<-----------"
+    puts "--------->>#{whose_turn}<<----------"
     puts "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
     puts ""
   end
@@ -196,7 +195,7 @@ class GameTable
   end
 
   def dealers_hand
-    return @dealer.show_hand[0] if whose_turn == @player
+    return [@dealer.show_hand[0]] if whose_turn == @player
     @dealer.show_hand 
   end
 
@@ -211,7 +210,6 @@ class GameTable
     @player.handscore = @dealer.handscore = 0
     @dealer.hand, @player.hand = [], []
   end
-
 end
 
 class Deck
@@ -232,9 +230,8 @@ class Deck
   def to_s
     @cards
   end
-
 end
-
+#------------------------------------
 class Card
   attr_reader :suit, :type
 
@@ -242,9 +239,8 @@ class Card
     @suit = suit
     @type = type
   end
-
 end
-
+#------------------------------------
 class Participant
   attr_accessor :hand, :move, :handscore, :roundscore
   
@@ -259,7 +255,14 @@ class Participant
     return CARDS[hand.first.type] if whose_turn == :player
     @handscore = 0
     @hand.each{ |card| @handscore += CARDS[card.type]} 
+    if busted? && include_spezialcard?
+      @handscore -= 10
+    end
     @handscore
+  end
+
+  def include_spezialcard?
+    @hand.any?{ |card| card.type == SPECIALCARD}
   end
 
   def show_hand
@@ -267,29 +270,25 @@ class Participant
   end
 
   def busted?
-    handscore > MAX
+    @handscore > MAX
   end
-
 end
-
-
+#------------------------------------
 class Player < Participant
   def to_s
     'Player'
   end 
 end
-
+#------------------------------------
 class Dealer < Participant  
   def to_s
     'Dealer'
   end 
 
   def over_min?
-    @handscore > DEALER_MIN
+    @handscore >= DEALER_MIN
   end
 end
-
-deck = Deck.new
 
 Game.new.play
 
