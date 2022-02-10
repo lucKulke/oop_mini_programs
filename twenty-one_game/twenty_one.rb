@@ -47,14 +47,24 @@ class Game
       display_table
       participants_turn
       display_winner
+      set_roundscore
       break unless decision_about('round')
     end
   end
 
 
   def display_winner
-    display_message(determine_winner)
+    winner = determine_winner
+    display_message(winner)
+    puts
   end
+
+  def set_roundscore
+    winner = determine_winner
+    @player.roundscore += 1 if winner == 'player_won'
+    @dealer.roundscore += 1 if winner == 'dealer_won'
+  end
+    
 
   def determine_winner
     if deck_empty? || @dealer.handscore == @player.handscore
@@ -67,7 +77,6 @@ class Game
       'dealer_won'
     end
   end
-
   
   def participants_turn
     @game_table.whose_turn = @player
@@ -79,8 +88,8 @@ class Game
   def players_turn
     players_decision = nil
     loop do 
-      players_decision = decision_about('hit_or_stay', :turn) ? :hit : :stay 
       return false if @player.busted? || deck_empty? 
+      players_decision = decision_about('hit_or_stay', :turn) ? :hit : :stay 
       break if players_decision == :stay
       draw_card(@player)
     end
@@ -88,6 +97,7 @@ class Game
   end
 
   def dealers_turn
+    display_table
     loop do
       break if @dealer.over_min?
       draw_card(@dealer)
@@ -96,6 +106,7 @@ class Game
   end
 
   def draw_card(participant)
+    display_table
     sleep (2) if participant == @dealer 
     participant.hand << @game_table.deck.cards.shift
     display_table
@@ -147,7 +158,7 @@ end
 
 class GameTable
   include Displayable
-  attr_accessor :deck, :whose_turn
+  attr_accessor :deck, :whose_turn, :start_of_round
   
   def initialize(player, dealer)
     @player = player
@@ -157,26 +168,36 @@ class GameTable
 
   def display
     clear_terminal
-    puts "______Twenty-One_______"
+    puts "_________Twenty-One__________"
     puts ""
     puts "Deck size = #{@deck.cards.size}"
     puts ""
     puts "      PlayerP. |  DealerP. "
     puts "-----------------------------"
     puts "total     #{@player.roundscore}          #{@dealer.roundscore}"
-    puts "hand      #{@player.handscore}          #{@dealer.handscore}" 
+    puts "hand      #{@player.handscore}          #{dealers_handscore}" 
     puts "_____________________________"
     puts ""
     puts "Dealer:"
-    puts "cards => #{@dealer.show_hand}"
+    puts "cards => #{dealers_hand}"
     puts ""
     puts "Player:"
     puts "cards => #{@player.show_hand}"
     puts "_____________________________"
     puts ""
-    puts "------>>#{whose_turn}<<-------"
+    puts "---------->>#{whose_turn}<<-----------"
     puts "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
     puts ""
+  end
+
+  def dealers_handscore
+    return @dealer.handscore(:player) if whose_turn == @player
+    @dealer.handscore
+  end
+
+  def dealers_hand
+    return @dealer.show_hand[0] if whose_turn == @player
+    @dealer.show_hand 
   end
 
   def prepare
@@ -186,6 +207,7 @@ class GameTable
   end
 
   def new_round
+    @whose_turn = @player
     @player.handscore = @dealer.handscore = 0
     @dealer.hand, @player.hand = [], []
   end
@@ -203,7 +225,8 @@ class Deck
     @cards = []
     SUIT.each do |suit|
       CARDS.each{ |type,_| @cards << Card.new(suit, type)}
-    end    
+    end
+    @cards.shuffle! 
   end   
 
   def to_s
@@ -232,7 +255,8 @@ class Participant
   end
 
 
-  def handscore
+  def handscore(whose_turn = :dealer)
+    return CARDS[hand.first.type] if whose_turn == :player
     @handscore = 0
     @hand.each{ |card| @handscore += CARDS[card.type]} 
     @handscore
@@ -255,8 +279,7 @@ class Player < Participant
   end 
 end
 
-class Dealer < Participant
-
+class Dealer < Participant  
   def to_s
     'Dealer'
   end 
